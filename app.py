@@ -4,7 +4,7 @@ import os
 # :閉じた錠と鍵: 環境変数からAPIキー取得
 openai.api_key = os.getenv("OPENAI_API_KEY")
 # :閉じた錠と鍵: ログインパスワード設定（ハードコードOK）
-PASSWORD = "blackjoe"
+PASSWORD = "nariagari"
 # :閉じた錠と鍵: ログイン認証
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -47,4 +47,5 @@ else:
             )
             result = response['choices'][0]['message']['content']
             st.success(":チェックマーク_緑: 台本が生成されました")
+
             st.text_area(":文書: 台本", result, height=500)
