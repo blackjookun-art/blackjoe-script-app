@@ -5,7 +5,7 @@ import openai
 # OpenAI APIキー設定（secrets.tomlから取得）
 # --------------------
 try:
-    openai.api_key = st.secrets["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"]
+    openai.api_key = st.secrets["OPENAI_API_KEY"]
 except KeyError:
     st.error("OpenAI APIキーが設定されていません。secrets.toml を確認してください。")
     st.stop()
@@ -88,4 +88,5 @@ if st.session_state.script_history:
             st.text_area(f"📄 履歴 {i+1} の台本", script, height=500)
 else:
     st.sidebar.write("（まだ台本がありません）")
+
 
