@@ -1,23 +1,13 @@
 import streamlit as st
 import openai
-
-# --------------------
-# APIキー設定
-# --------------------
-try:
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
-except KeyError:
-    st.error("OpenAI APIキーが設定されていません。secrets.toml を確認してください。")
-    st.stop()
-
-# --------------------
-# ログイン処理
-# --------------------
-PASSWORD = "nariagari"
-
+import os
+# :閉じた錠と鍵: 環境変数からAPIキー取得
+openai.api_key = os.getenv("OPENAI_API_KEY")
+# :閉じた錠と鍵: ログインパスワード設定（ハードコードOK）
+PASSWORD = "blackjoe"
+# :閉じた錠と鍵: ログイン認証
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
-
 if not st.session_state.authenticated:
     st.title("ログイン")
     password = st.text_input("パスワードを入力", type="password")
@@ -26,15 +16,12 @@ if not st.session_state.authenticated:
         st.experimental_rerun()
     else:
         st.stop()
-
-# --------------------
-# メイン画面
-# --------------------
-st.title("ブラックジョー君の台本作成")
-
-if st.button("作成する"):
-    with st.spinner("台本を生成中..."):
-        prompt = """
+else:
+    # メイン画面
+    st.title("ブラックジョー君の台本作成")
+    if st.button("作成する"):
+        with st.spinner("台本を生成中..."):
+            prompt = """
 あなたは、YouTubeショートでバズるための「台本職人AI」です。
 以下の条件をすべて満たす、60秒以内のショート動画用の台本を1本作成してください：
 【目的】
@@ -53,17 +40,11 @@ if st.button("作成する"):
 【タイトル】：（YouTubeショート用の強いタイトル）
 【台本】：（セリフ形式で改行、話者ごとに「男：」「女：」などを明記）
 【タグ】：（YouTubeにアップロードする際に使える10個のタグ）
-        """
-
-        try:
-            response = openai.chat.completions.create(
+            """
+            response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.8,
-                max_tokens=600
+                messages=[{"role": "user", "content": prompt}]
             )
-            result = response.choices[0].message.content
-            st.success("✅ 台本が生成されました！")
-            st.text_area("📄 台本", result, height=500)
-        except Exception as e:
-            st.error(f"台本生成中にエラーが発生しました: {e}")
+            result = response['choices'][0]['message']['content']
+            st.success(":チェックマーク_緑: 台本が生成されました")
+            st.text_area(":文書: 台本", result, height=500)
