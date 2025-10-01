@@ -48,3 +48,12 @@ else:
             result = response.messages[0].content
             st.success("✅ 台本が生成されました")
             st.text_area("📄 台本", result, height=500)
+
+import streamlit as st
+
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+    st.success("Secrets 読み込み成功！")
+except KeyError:
+    st.error("GEMINI_API_KEY が見つかりません。secrets.toml を確認してください。")
+
