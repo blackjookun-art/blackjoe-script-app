@@ -2,11 +2,10 @@ import streamlit as st
 import openai
 
 # --------------------
-# OpenAI APIキー（テスト用に直接設定）
+# OpenAI APIキー（直接埋め込み or 環境変数）
 # --------------------
 openai.api_key = "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"
 
-# APIキーが空でないか確認
 if not openai.api_key:
     st.error("OpenAI APIキーが設定されていません")
     st.stop()
@@ -45,11 +44,14 @@ if st.button("台本を作成する"):
 【台本】：（セリフ形式で改行、話者ごとに「男：」「女：」などを明記）
 【タグ】：（YouTubeにアップロードする際に使える10個のタグ）
         """
-        response = openai.ChatCompletion.create(
+        # 最新 SDK に対応
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}]
         )
-        result = response['choices'][0]['message']['content']
+
+        # 結果取得
+        result = response.choices[0].message.content
 
         # 履歴に追加（最大50件）
         st.session_state.script_history.insert(0, result)
