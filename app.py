@@ -1,33 +1,43 @@
 import streamlit as st
+import openai
+import os
 
-# 初期化：台本履歴の初期化
-if "script_history" not in st.session_state:
-    st.session_state.script_history = []  # 台本履歴の初期化
+# OpenAI APIキーを環境変数から取得
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# ログインなしで台本作成ページを表示
+# メイン画面
 st.title("ブラックジョー君の台本作成")
-st.write("台本作成を始めましょう！")
 
-# 台本作成のテキストエリア
-new_script = st.text_area("新しい台本を作成", height=150)
+if st.button("作成する"):
+    with st.spinner("台本を生成中..."):
+        prompt = """
+あなたは、YouTubeショートでバズるための「台本職人AI」です。
+以下の条件をすべて満たす、60秒以内のショート動画用の台本を1本作成してください：
 
-# 保存ボタン
-if st.button("台本を保存"):
-    if new_script:
-        st.session_state.script_history.append(new_script)
-        st.success("台本が保存されました！")
-    else:
-        st.warning("台本が入力されていません。")
+【目的】
+・日本の若者（10〜30代）向けにバズるショート動画台本を作成する
+・ブラックユーモア、皮肉、アメリカンジョーク、腹黒ネタ、ちょいスケベ（R-15以内）を含める
 
-# 過去の台本履歴
-st.subheader("過去の台本履歴")
-if st.session_state.script_history:
-    for idx, script in enumerate(st.session_state.script_history):
-        st.write(f"{idx + 1}. {script}")
-else:
-    st.write("まだ台本が作成されていません。")
+【構成】
+・最初の3秒で視聴者の注意を引く「強烈なフック」
+・短いセリフで展開し、視聴者の共感 or 驚き or 笑いを引き出す
+・ラストに「オチ」でインパクトを残す（爆笑 / 皮肉 / 逆転 / セクシーな余韻など）
+・話者は1～2名まで（会話形式でセリフは明確に）
 
-# 履歴リセット機能
-if st.button("履歴をリセット"):
-    st.session_state.script_history = []
-    st.success("履歴がリセットされました。")
+【重要な条件】
+・毎回、登場人物、シチュエーション、展開、オチは変えること（ワンパターン禁止）
+・YouTubeショートのトレンドや、若者の関心事、SNSや日常生活で"ありそうなネタ"をベースにする
+・ネタは日本人向けの文化・文脈に沿ったものにする（例：LINE、コンビニ、就活、バイト、マッチングアプリ、ゲーム、カラオケ、学校、SNSなど）
+
+【出力フォーマット】
+【タイトル】：（YouTubeショート用の強いタイトル）
+【台本】：（セリフ形式で改行、話者ごとに「男：」「女：」などを明記）
+【タグ】：（YouTubeにアップロードする際に使える10個のタグ）
+        """
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        result = response['choices'][0]['message']['content']
+        st.success("✅ 台本が生成されました")
+        st.text_area("📝 台本", result, height=500)
