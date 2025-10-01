@@ -1,6 +1,6 @@
 import streamlit as st
 
-# 初期化
+# 初期化：台本履歴の初期化
 if "script_history" not in st.session_state:
     st.session_state.script_history = []  # 台本履歴の初期化
 
