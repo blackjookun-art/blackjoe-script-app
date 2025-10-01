@@ -3,7 +3,7 @@ import streamlit as st
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 # パスワードの設定（ここで自分のパスワードを設定）
-PASSWORD = "your_password_here"  # ここに自分のパスワードを設定
+PASSWORD = "blackjoe"  # ここに自分のパスワードを設定
 # ログイン画面の処理
 if not st.session_state.authenticated:
     st.title("ログイン")
@@ -42,3 +42,4 @@ else:
     if st.button("履歴をリセット"):
         st.session_state.script_history = []
         st.success("履歴がリセットされました。")
+
