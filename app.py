@@ -2,27 +2,37 @@ import streamlit as st
 import openai
 
 # --------------------
-# OpenAI APIキー（直接埋め込み or 環境変数）
+# APIキー設定
 # --------------------
-openai.api_key = "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"
-
-if not openai.api_key:
-    st.error("OpenAI APIキーが設定されていません")
+try:
+    openai.api_key = st.secrets["OPENAI_API_KEY"]
+except KeyError:
+    st.error("OpenAI APIキーが設定されていません。secrets.toml を確認してください。")
     st.stop()
 
 # --------------------
-# セッション履歴の初期化
+# ログイン処理
 # --------------------
-if "script_history" not in st.session_state:
-    st.session_state.script_history = []
+PASSWORD = "nariagari"
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.title("ログイン")
+    password = st.text_input("パスワードを入力", type="password")
+    if password == PASSWORD:
+        st.session_state.authenticated = True
+        st.experimental_rerun()
+    else:
+        st.stop()
 
 # --------------------
 # メイン画面
 # --------------------
 st.title("ブラックジョー君の台本作成")
 
-# 台本作成ボタン
-if st.button("台本を作成する"):
+if st.button("作成する"):
     with st.spinner("台本を生成中..."):
         prompt = """
 あなたは、YouTubeショートでバズるための「台本職人AI」です。
@@ -44,30 +54,16 @@ if st.button("台本を作成する"):
 【台本】：（セリフ形式で改行、話者ごとに「男：」「女：」などを明記）
 【タグ】：（YouTubeにアップロードする際に使える10個のタグ）
         """
-        # 最新 SDK に対応
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
-        )
 
-        # 結果取得
-        result = response.choices[0].message.content
-
-        # 履歴に追加（最大50件）
-        st.session_state.script_history.insert(0, result)
-        if len(st.session_state.script_history) > 50:
-            st.session_state.script_history = st.session_state.script_history[:50]
-
-        st.success("台本が生成されました！")
-        st.text_area("生成された台本", result, height=500)
-
-# --------------------
-# 履歴サイドバー
-# --------------------
-st.sidebar.title("過去の台本履歴")
-if st.session_state.script_history:
-    for i, script in enumerate(st.session_state.script_history):
-        if st.sidebar.button(f"履歴 {i+1}", key=f"history_{i}"):
-            st.text_area(f"履歴 {i+1} の台本", script, height=500)
-else:
-    st.sidebar.write("（まだ台本がありません）")
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.8,
+                max_tokens=600
+            )
+            result = response.choices[0].message.content
+            st.success("✅ 台本が生成されました！")
+            st.text_area("📄 台本", result, height=500)
+        except Exception as e:
+            st.error(f"台本生成中にエラーが発生しました: {e}")
