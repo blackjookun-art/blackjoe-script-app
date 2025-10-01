@@ -1,9 +1,9 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import os
 
-# OpenAI APIキーを環境変数から取得
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# OpenAIクライアントを初期化（環境変数 OPENAI_API_KEY を使用）
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # メイン画面
 st.title("ブラックジョー君の台本作成")
@@ -34,10 +34,12 @@ if st.button("作成する"):
 【台本】：（セリフ形式で改行、話者ごとに「男：」「女：」などを明記）
 【タグ】：（YouTubeにアップロードする際に使える10個のタグ）
         """
-        response = openai.ChatCompletion.create(
+
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}]
         )
-        result = response['choices'][0]['message']['content']
+
+        result = response.choices[0].message.content
         st.success("✅ 台本が生成されました")
         st.text_area("📝 台本", result, height=500)
