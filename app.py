@@ -2,8 +2,20 @@ import streamlit as st
 from openai import OpenAI
 import os
 
-# OpenAIクライアントを初期化（環境変数 OPENAI_API_KEY を使用）
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Streamlit secrets から読み込む
+api_key = st.secrets["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"]
+
+client = OpenAI(api_key=api_key)
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Hello! Write a short joke."}
+    ]
+)
+
+st.write(response.choices[0].message.content)
 
 # メイン画面
 st.title("ブラックジョー君の台本作成")
@@ -43,3 +55,4 @@ if st.button("作成する"):
         result = response.choices[0].message.content
         st.success("✅ 台本が生成されました")
         st.text_area("📝 台本", result, height=500)
+
