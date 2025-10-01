@@ -1,23 +1,28 @@
 import streamlit as st
 import openai
-import os
 
-# OpenAI APIキー
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# --------------------
+# OpenAI APIキー（テスト用に直接設定）
+# --------------------
+openai.api_key = "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"
+
+# APIキーが空でないか確認
 if not openai.api_key:
     st.error("OpenAI APIキーが設定されていません")
     st.stop()
 
-# 履歴リストの初期化（セッション中）
+# --------------------
+# セッション履歴の初期化
+# --------------------
 if "script_history" not in st.session_state:
     st.session_state.script_history = []
 
 # --------------------
-# :チェックマーク_緑: メイン画面
+# メイン画面
 # --------------------
 st.title("ブラックジョー君の台本作成")
 
-# :小さいひし形_青: 台本作成ボタン
+# 台本作成ボタン
 if st.button("台本を作成する"):
     with st.spinner("台本を生成中..."):
         prompt = """
@@ -46,7 +51,7 @@ if st.button("台本を作成する"):
         )
         result = response['choices'][0]['message']['content']
 
-        # 履歴に追加（最大50件まで）
+        # 履歴に追加（最大50件）
         st.session_state.script_history.insert(0, result)
         if len(st.session_state.script_history) > 50:
             st.session_state.script_history = st.session_state.script_history[:50]
@@ -55,7 +60,7 @@ if st.button("台本を作成する"):
         st.text_area("生成された台本", result, height=500)
 
 # --------------------
-# :複数の本: 履歴サイドバー
+# 履歴サイドバー
 # --------------------
 st.sidebar.title("過去の台本履歴")
 if st.session_state.script_history:
