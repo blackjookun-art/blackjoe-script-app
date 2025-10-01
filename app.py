@@ -1,27 +1,23 @@
 import streamlit as st
-import openai
-import os
-# :閉じた錠と鍵: 環境変数からAPIキー取得
-openai.api_key = os.getenv("OPENAI_API_KEY")
-# :閉じた錠と鍵: ログインパスワード設定（ハードコードOK）
-PASSWORD = "blackjoe"
-# :閉じた錠と鍵: ログイン認証
+
+# 初期化
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+
+# ログイン画面
 if not st.session_state.authenticated:
     st.title("ログイン")
-    password = st.text_input("パスワードを入力", type="password")
-    if password == PASSWORD:
+    input_pw = st.text_input("パスワードを入力してください", type="password")
+    if input_pw == "your_password_here":  # ここを自分のパスワードに変更
         st.session_state.authenticated = True
-        st.experimental_rerun()
+        st.experimental_rerun()  # ログイン成功後にページをリロード
     else:
-        st.stop()
+        st.error("パスワードが間違っています。")
 else:
-    # メイン画面
+    # ログイン後の画面（台本作成など）
     st.title("ブラックジョー君の台本作成")
-    if st.button("作成する"):
-        with st.spinner("台本を生成中..."):
-            prompt = """
+    st.write("ログインしました！")
+    # 以下に台本作成などの処理を続ける
 あなたは、YouTubeショートでバズるための「台本職人AI」です。
 以下の条件をすべて満たす、60秒以内のショート動画用の台本を1本作成してください：
 【目的】
@@ -49,5 +45,6 @@ else:
             st.success(":チェックマーク_緑: 台本が生成されました")
 
             st.text_area(":文書: 台本", result, height=500)
+
 
 
